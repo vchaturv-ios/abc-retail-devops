@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Eclipse/IntelliJ
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+
+# Maven target directory
+/target/
+
+# Backup files
+*.bak
+
+# Logs
+*.log
+
