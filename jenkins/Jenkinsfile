@@ -40,7 +40,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_PATH')]) {
                     sh '''
-                        ansible-playbook deploy-k8s.yml \
+                        ansible-playbook ansible/deploy-k8s.yml \
                           -e new_image=${DOCKER_IMAGE} \
                           -e kubeconfig_path=$KUBECONFIG_PATH
                     '''

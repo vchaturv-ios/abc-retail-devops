@@ -33,7 +33,7 @@ echo "📋 Creating Jenkins Pipeline..."
 # Create the pipeline job
 ssh -i abc-retail-free-key.pem ec2-user@34.228.11.74 << 'JENKINS_PIPELINE'
 # Create the pipeline job
-docker exec 79b2e2bfa09a java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 -auth admin:admin123 create-job abc-retail-pipeline < /tmp/create-jenkins-pipeline.xml
+docker exec 79b2e2bfa09a java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 -auth admin:admin123 create-job abc-retail-pipeline-fixed < /tmp/../jenkins/create-jenkins-pipeline.xml
 
 echo "Pipeline job created successfully!"
 JENKINS_PIPELINE
@@ -45,7 +45,7 @@ echo ""
 echo "📋 Access Information:"
 echo "======================"
 echo "🔧 Jenkins: http://34.228.11.74:8080 (admin/admin123)"
-echo "📊 Pipeline: http://34.228.11.74:8080/job/abc-retail-pipeline/"
+echo "📊 Pipeline: http://34.228.11.74:8080/job/abc-retail-pipeline-fixed/"
 echo "🌐 Application: http://107.21.169.207:8080"
 echo "📈 Monitoring: http://34.229.169.187:3000 (admin/admin123)"
 echo ""

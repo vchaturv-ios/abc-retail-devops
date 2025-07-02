@@ -1,10 +1,5 @@
 global:
   scrape_interval: 15s
-  evaluation_interval: 15s
-
-rule_files:
-  # - "first_rules.yml"
-  # - "second_rules.yml"
 
 scrape_configs:
   - job_name: 'prometheus'
@@ -13,31 +8,16 @@ scrape_configs:
 
   - job_name: 'node-exporter'
     static_configs:
-      - targets: ['localhost:9100']
-
-  - job_name: 'kubernetes-pods'
-    kubernetes_sd_configs:
-      - role: pod
-    relabel_configs:
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-        action: keep
-        regex: true
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
-        action: replace
-        target_label: __metrics_path__
-        regex: (.+)
-      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
-        action: replace
-        regex: ([^:]+)(?::\d+)?;(\d+)
-        replacement: $1:$2
-        target_label: __address__
-
-  - job_name: 'kubernetes-nodes'
-    static_configs:
-      - targets: ['13.218.204.67:9100']
+      - targets: ['node-exporter:9100']
 
   - job_name: 'abc-retail-app'
     static_configs:
-      - targets: ['13.218.204.67:30080']
-    metrics_path: '/metrics'
-    scrape_interval: 10s 
+      - targets: ['107.21.169.207:8080']
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 10s
+
+  - job_name: 'jenkins'
+    static_configs:
+      - targets: ['34.228.11.74:8080']
+    metrics_path: '/prometheus'
+    scrape_interval: 30s

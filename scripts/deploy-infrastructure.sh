@@ -24,7 +24,7 @@ echo "🚀 Deploying CloudFormation stack..."
 # Deploy infrastructure using CloudFormation
 aws cloudformation create-stack \
   --stack-name abc-retail-devops \
-  --template-body file://aws-cloudformation-template.yml \
+  --template-body file://aws/aws-cloudformation-template.yml \
   --capabilities CAPABILITY_NAMED_IAM \
   --parameters ParameterKey=Environment,ParameterValue=production
 

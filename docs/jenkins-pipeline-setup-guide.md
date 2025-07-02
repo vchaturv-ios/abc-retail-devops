@@ -8,7 +8,7 @@
 ## Step 2: Create New Pipeline Job
 
 1. **Click "New Item"** on the Jenkins dashboard
-2. **Enter job name**: `abc-retail-pipeline`
+2. **Enter job name**: `abc-retail-pipeline-fixed`
 3. **Select "Pipeline"** and click "OK"
 
 ## Step 3: Configure Pipeline
@@ -139,7 +139,7 @@ pipeline {
 
 ## Step 6: Run the Pipeline
 
-1. **Go to**: Dashboard → abc-retail-pipeline
+1. **Go to**: Dashboard → abc-retail-pipeline-fixed
 2. **Click**: "Build Now"
 3. **Monitor**: The build progress in real-time
 

@@ -31,8 +31,8 @@ fi
 # === BUILD DOCKER IMAGE ===
 echo ""
 echo "[STEP 1] Building Docker image..."
-if [ ! -f "Dockerfile" ]; then
-    echo "❌ Dockerfile not found in current directory"
+if [ ! -f "docker/Dockerfile" ]; then
+    echo "❌ Dockerfile not found in docker directory"
     exit 1
 fi
 
@@ -83,8 +83,8 @@ echo "🎉 [DONE] Application deployed to Kubernetes!"
 echo ""
 echo "📋 Next Steps:"
 echo "   1. Check your service NodePort or LoadBalancer for external access"
-echo "   2. For Jenkins CI/CD, use: ./setup-jenkins-pipeline.sh"
-echo "   3. For monitoring setup, use: ./setup-monitoring.sh <monitoring-server-ip> <ssh-key-path>"
+echo "   2. For Jenkins CI/CD, use: ./scripts/setup-jenkins-pipeline.sh"
+echo "   3. For monitoring setup, use: ./scripts/setup-monitoring.sh <monitoring-server-ip> <ssh-key-path>"
 echo ""
 echo "🔍 Useful Commands:"
 echo "   kubectl get pods -l app=$APP_NAME"

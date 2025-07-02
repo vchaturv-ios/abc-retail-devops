@@ -52,7 +52,7 @@ chmod +x *.sh
 
 ```
 abc-retail-devops/
-├── aws-free-tier-setup.yml      # Free tier infrastructure
+├── aws/aws-free-tier-setup.yml      # Free tier infrastructure
 ├── deploy-free-tier.sh          # Free tier deployment script
 ├── build-and-push-free.sh       # Docker build script
 ├── deploy-app-free.sh           # Application deployment

@@ -15,7 +15,7 @@ Jenkins.instance.setAuthorizationStrategy(strategy)
 Jenkins.instance.save()
 
 // Create pipeline job
-def job = Jenkins.instance.createProject(WorkflowJob.class, "abc-retail-pipeline")
+def job = Jenkins.instance.createProject(WorkflowJob.class, "abc-retail-pipeline-fixed")
 
 // Define pipeline script
 def pipelineScript = '''

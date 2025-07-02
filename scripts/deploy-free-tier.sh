@@ -25,7 +25,7 @@ echo ""
 echo "🚀 Deploying Free Tier Infrastructure..."
 
 # Deploy free tier infrastructure
-ansible-playbook aws-free-tier-setup.yml
+ansible-playbook aws/aws-free-tier-setup.yml
 
 if [ $? -eq 0 ]; then
     echo ""

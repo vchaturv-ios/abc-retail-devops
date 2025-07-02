@@ -130,7 +130,7 @@ cat > /tmp/pipeline-config.xml << 'EOF'
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_PATH')]) {
                     sh '''
-                        ansible-playbook deploy-k8s.yml \
+                        ansible-playbook ansible/deploy-k8s.yml \
                           -e new_image=${DOCKER_IMAGE} \
                           -e kubeconfig_path=$KUBECONFIG_PATH
                     '''
@@ -172,8 +172,8 @@ EOF
 
 # Create/Update the pipeline job
 ssh -i "$SSH_KEY" ec2-user@$JENKINS_IP << 'PIPELINE_SETUP'
-docker exec 79b2e2bfa09a java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 -auth admin:admin123 create-job abc-retail-pipeline < /tmp/pipeline-config.xml || \
-docker exec 79b2e2bfa09a java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 -auth admin:admin123 update-job abc-retail-pipeline < /tmp/pipeline-config.xml
+docker exec 79b2e2bfa09a java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 -auth admin:admin123 create-job abc-retail-pipeline-fixed < /tmp/pipeline-config.xml || \
+docker exec 79b2e2bfa09a java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 -auth admin:admin123 update-job abc-retail-pipeline-fixed < /tmp/pipeline-config.xml
 PIPELINE_SETUP
 
 echo "✅ Jenkins Pipeline job created/updated"
@@ -182,7 +182,7 @@ echo "📋 Step 5: Running the Pipeline..."
 
 # Trigger the pipeline
 ssh -i "$SSH_KEY" ec2-user@$JENKINS_IP << 'RUN_PIPELINE'
-docker exec 79b2e2bfa09a java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 -auth admin:admin123 build abc-retail-pipeline
+docker exec 79b2e2bfa09a java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 -auth admin:admin123 build abc-retail-pipeline-fixed
 RUN_PIPELINE
 
 echo ""
@@ -192,13 +192,13 @@ echo ""
 echo "📋 Access Information:"
 echo "======================"
 echo "🔧 Jenkins: $JENKINS_URL (admin/admin123)"
-echo "📊 Pipeline: $JENKINS_URL/job/abc-retail-pipeline/"
+echo "📊 Pipeline: $JENKINS_URL/job/abc-retail-pipeline-fixed/"
 echo "🌐 Application: http://107.21.169.207:30080"
 echo "📈 Monitoring: http://34.229.169.187:3000 (admin/admin123)"
 echo ""
 echo "📝 Monitoring the Pipeline:"
 echo "1. Go to Jenkins: $JENKINS_URL"
-echo "2. Navigate to: abc-retail-pipeline"
+echo "2. Navigate to: abc-retail-pipeline-fixed"
 echo "3. Click on the latest build to see progress"
 echo "4. Check console output for detailed logs"
 echo ""

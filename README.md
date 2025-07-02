@@ -1,87 +1,70 @@
 # ABC Retail DevOps Project
 
-## Overview
-This project demonstrates a complete DevOps pipeline for a Java application using:
-- **GitHub** for source code management
-- **Jenkins** for CI/CD
-- **Docker** for containerization
-- **Kubernetes (k3s on AWS EC2)** for deployment
-- **Prometheus & Grafana** for monitoring
+A comprehensive DevOps project demonstrating CI/CD pipeline with Jenkins, Docker, Kubernetes, and monitoring using Prometheus and Grafana on AWS.
 
 ## Project Structure
+
 ```
 abc-retail-devops/
-├── src/                   # Java source code
-├── k8s/                   # Kubernetes manifests (deployment.yaml, service.yaml, etc.)
-├── Dockerfile             # For building the app image
-├── Jenkinsfile            # CI/CD pipeline (for Jenkins)
-├── setup-all.sh           # Single script to run the full flow
-├── README.md              # This file
-├── .gitignore
+├── src/                      # Java application source code
+├── docker/                   # Docker configurations
+│   ├── Dockerfile            # Application container
+│   └── Dockerfile.jenkins    # Jenkins container
+├── jenkins/                  # Jenkins pipeline and setup
+│   ├── Jenkinsfile           # CI/CD pipeline definition
+│   ├── create-jenkins-pipeline.xml
+│   └── jenkins-setup.groovy
+├── ansible/                  # Ansible automation playbooks
+│   ├── deploy-k8s.yml        # Kubernetes deployment
+│   └── deploy-docker.yml     # Docker deployment
+├── k8s/                      # Kubernetes manifests
+├── monitoring/               # Monitoring stack configuration
+│   ├── prometheus.yml
+│   ├── grafana-dashboard.json
+│   └── docker-compose-monitoring.yml
+├── aws/                      # AWS infrastructure templates
+├── scripts/                  # Automation and setup scripts
+├── docs/                     # Project documentation
+├── inventory/                # Ansible inventory files
+└── pom.xml                   # Maven project configuration
 ```
 
-## Prerequisites
-- Docker installed and running
-- kubectl installed and configured to point to your k3s cluster (on AWS EC2)
-- (Optional) k3s installed on your AWS EC2 instance
-- (Optional) Jenkins server for CI/CD
-
 ## Quick Start
-1. **Clone the repository:**
-   ```sh
-   git clone <your-repo-url>
-   cd abc-retail-devops
-   ```
-2. **Run the setup script:**
-   ```sh
-   chmod +x setup-all.sh
-   ./setup-all.sh
-   ```
-   This will:
-   - Build and push the Docker image
-   - Deploy the app to your Kubernetes cluster using manifests in `k8s/`
 
-3. **Access your app:**
-   - Find the NodePort or LoadBalancer port from your service manifest
-   - Visit `http://<EC2_PUBLIC_IP>:<NodePort>` in your browser
+1. **Clone the repository**
+2. **Run the complete setup**: `./scripts/setup-all.sh`
+3. **Access your services**:
+   - Application: http://your-k8s-ip:30080
+   - Jenkins: http://your-jenkins-ip:8080 (admin/admin123)
+   - Monitoring: http://your-monitoring-ip:3000 (admin/admin123)
 
-## Jenkins CI/CD
-- Use the provided `Jenkinsfile` for automated build, push, and deploy.
-- Store your kubeconfig as a Jenkins secret file credential for secure deployments.
+## Documentation
 
-## Monitoring
-- See `monitoring/` or ask for Prometheus/Grafana setup instructions.
+- **[Main Documentation](docs/README.md)** - Complete setup and usage guide
+- **[Free Tier Setup](docs/README-FREE-TIER.md)** - AWS free tier specific instructions
+- **[Jenkins Setup Guide](docs/jenkins-pipeline-setup-guide.md)** - Detailed Jenkins configuration
 
-## Clean Up
-- To remove all resources:
-  ```sh
-  kubectl delete -f k8s/
-  ```
+## Key Features
 
-## Notes
-- Do **not** commit secrets or key files to the repo.
-- For any issues, see the comments in `setup-all.sh` or open an issue.
+- **CI/CD Pipeline**: Jenkins with Maven build, Docker image creation, and Kubernetes deployment
+- **Containerization**: Docker images for application and Jenkins
+- **Orchestration**: Kubernetes deployment with health checks
+- **Monitoring**: Prometheus metrics collection and Grafana dashboards
+- **Infrastructure as Code**: AWS CloudFormation and Ansible automation
+- **Automation**: One-click setup scripts for all components
 
-# Monitoring Setup
+## Technologies Used
 
-To set up Prometheus and Grafana for monitoring:
+- **Java** - Application backend
+- **Maven** - Build tool
+- **Docker** - Containerization
+- **Jenkins** - CI/CD pipeline
+- **Kubernetes (k3s)** - Container orchestration
+- **Ansible** - Infrastructure automation
+- **Prometheus** - Metrics collection
+- **Grafana** - Monitoring dashboards
+- **AWS** - Cloud infrastructure
 
-1. **SSH into your monitoring EC2 instance:**
-   ```sh
-   ssh -i <your-key>.pem ec2-user@<monitoring-instance-public-ip>
-   ```
-2. **Clone this repository (if not already):**
-   ```sh
-   git clone <your-repo-url>
-   cd abc-retail-devops
-   ```
-3. **Run the monitoring setup script:**
-   ```sh
-   chmod +x setup-monitoring.sh
-   ./setup-monitoring.sh
-   ```
-4. **Access Prometheus and Grafana:**
-   - Prometheus: `http://<monitoring-instance-public-ip>:9090`
-   - Grafana: `http://<monitoring-instance-public-ip>:3000` (login: admin/admin123)
+## Support
 
-Prometheus is pre-configured to scrape your k3s/app server. You can add more scrape targets in `monitoring/prometheus.yml` as needed.
+For detailed setup instructions and troubleshooting, see the [main documentation](docs/README.md).

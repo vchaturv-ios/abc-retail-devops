@@ -64,9 +64,9 @@ for i in {1..30}; do
 done
 
 # Import dashboard and set as home
-if [ -f grafana-dashboard.json ]; then
+if [ -f monitoring/grafana-dashboard.json ]; then
   echo "[INFO] Importing Grafana dashboard..."
-  IMPORT_RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" -d @grafana-dashboard.json \
+  IMPORT_RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" -d @monitoring/grafana-dashboard.json \
     http://admin:admin123@localhost:3000/api/dashboards/db || true)
   echo "$IMPORT_RESPONSE"
   DASHBOARD_UID=$(echo "$IMPORT_RESPONSE" | grep -o '"uid":"[^"]*"' | head -1 | cut -d'"' -f4)
@@ -86,14 +86,14 @@ if [ -f grafana-dashboard.json ]; then
     echo "[WARN] Could not determine dashboard UID for home dashboard."
   fi
 else
-  echo "[WARN] grafana-dashboard.json not found, skipping dashboard import."
+  echo "[WARN] monitoring/grafana-dashboard.json not found, skipping dashboard import."
 fi
 
 echo "[DONE] Prometheus: http://$MON_IP:9090"
 echo "[DONE] Grafana: http://$MON_IP:3000 (admin/admin123)"
 
 # Create Prometheus configuration
-cat > prometheus.yml << EOF
+cat > monitoring/prometheus.yml << EOF
 global:
   scrape_interval: 15s
 
@@ -119,11 +119,11 @@ scrape_configs:
     scrape_interval: 30s
 EOF
 
-echo "✅ Prometheus configuration created: prometheus.yml"
+echo "✅ Prometheus configuration created: monitoring/prometheus.yml"
 
 # Copy configuration to monitoring server
 echo "📤 Copying configuration to monitoring server..."
-scp -i "$KEY_PATH" prometheus.yml "$USER@$MON_IP:/tmp/"
+scp -i "$KEY_PATH" monitoring/prometheus.yml "$USER@$MON_IP:/tmp/"
 
 # Update Prometheus configuration on the server
 ssh -i "$KEY_PATH" "$USER@$MON_IP" << 'EOF'
@@ -134,7 +134,7 @@ EOF
 echo "✅ Prometheus configuration updated and restarted"
 
 # Create a simple Grafana dashboard configuration
-cat > grafana-dashboard.json << 'EOF'
+cat > monitoring/grafana-dashboard.json << 'EOF'
 {
   "dashboard": {
     "id": null,
@@ -198,7 +198,7 @@ cat > grafana-dashboard.json << 'EOF'
 }
 EOF
 
-echo "✅ Grafana dashboard configuration created: grafana-dashboard.json"
+echo "✅ Grafana dashboard configuration created: monitoring/grafana-dashboard.json"
 
 echo ""
 echo "🎯 Next Steps:"
