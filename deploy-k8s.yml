@@ -1,0 +1,59 @@
+---
+- name: Deploy ABC Retail App to Kubernetes
+  hosts: k8s-master
+  become: yes
+  tasks:
+    - name: Create namespace for ABC retail app
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: abc-retail
+
+    - name: Create Docker Hub secret
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: dockerhub-secret
+            namespace: abc-retail
+          type: kubernetes.io/dockerconfigjson
+          data:
+            .dockerconfigjson: "{{ lookup('env', 'DOCKER_CONFIG_BASE64') }}"
+
+    - name: Deploy ABC Retail application
+      kubernetes.core.k8s:
+        state: present
+        src: k8s/deployment.yaml
+        namespace: abc-retail
+
+    - name: Deploy ABC Retail service
+      kubernetes.core.k8s:
+        state: present
+        src: k8s/service.yml
+        namespace: abc-retail
+
+    - name: Wait for deployment to be ready
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        name: abc-retail-deployment
+        namespace: abc-retail
+      register: deployment_info
+      until: deployment_info.resources[0].status.readyReplicas == deployment_info.resources[0].status.replicas
+      retries: 30
+      delay: 10
+
+    - name: Get service external IP
+      kubernetes.core.k8s_info:
+        kind: Service
+        name: abc-retail-service
+        namespace: abc-retail
+      register: service_info
+
+    - name: Display service information
+      debug:
+        msg: "ABC Retail App deployed successfully! Service IP: {{ service_info.resources[0].status.loadBalancer.ingress[0].ip if service_info.resources[0].status.loadBalancer.ingress else 'Pending' }}" 

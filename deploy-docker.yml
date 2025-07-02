@@ -1,0 +1,25 @@
+---
+- name: Deploy ABC Retail App Docker container
+  hosts: appservers
+  become: yes
+  tasks:
+    - name: Pull latest docker image
+      community.docker.docker_image:
+        name: vchaturvdocker/abc-retail-app
+        source: pull
+
+    - name: Stop and remove old container (if exists)
+      community.docker.docker_container:
+        name: abc-retail-app
+        state: absent
+        force_kill: yes
+      ignore_errors: yes
+
+    - name: Run new container
+      community.docker.docker_container:
+        name: abc-retail-app
+        image: vchaturvdocker/abc-retail-app:latest
+        state: started
+        ports:
+          - "8080:8080"
+        restart_policy: always

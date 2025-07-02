@@ -1,0 +1,114 @@
+---
+- name: Setup Amazon EKS Cluster for ABC Retail
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create EKS Cluster
+      amazon.aws.eks_cluster:
+        region: us-east-1
+        name: abc-retail-cluster
+        version: "1.24"
+        role_arn: "arn:aws:iam::{{ aws_account_id }}:role/eks-cluster-role"
+        vpc_config:
+          subnet_ids:
+            - "{{ public_subnet_id }}"
+            - "{{ private_subnet_id }}"
+          security_group_ids:
+            - "{{ eks_security_group_id }}"
+        tags:
+          Name: "abc-retail-eks-cluster"
+          Environment: "production"
+
+    - name: Create EKS Node Group
+      amazon.aws.eks_node_group:
+        region: us-east-1
+        cluster_name: abc-retail-cluster
+        name: abc-retail-nodegroup
+        nodegroup_role_arn: "arn:aws:iam::{{ aws_account_id }}:role/eks-nodegroup-role"
+        subnets:
+          - "{{ private_subnet_id }}"
+        instance_types:
+          - t3.medium
+        scaling_config:
+          min_size: 2
+          max_size: 4
+          desired_size: 2
+        disk_size: 20
+        tags:
+          Name: "abc-retail-nodegroup"
+
+    - name: Update kubeconfig
+      shell: |
+        aws eks update-kubeconfig --region us-east-1 --name abc-retail-cluster
+      register: kubeconfig_result
+
+    - name: Install AWS Load Balancer Controller
+      kubernetes.core.k8s:
+        state: present
+        src: https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/v2_4_7_full.yaml
+
+    - name: Create Storage Class for EBS
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: storage.k8s.io/v1
+          kind: StorageClass
+          metadata:
+            name: ebs-sc
+            annotations:
+              storageclass.kubernetes.io/is-default-class: "true"
+          provisioner: ebs.csi.aws.com
+          volumeBindingMode: WaitForFirstConsumer
+          parameters:
+            type: gp3
+            iops: "3000"
+            throughput: "125"
+
+    - name: Create Namespace for ABC Retail
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: abc-retail
+
+    - name: Deploy ABC Retail Application to EKS
+      kubernetes.core.k8s:
+        state: present
+        src: k8s/deployment.yaml
+        namespace: abc-retail
+
+    - name: Deploy ABC Retail Service to EKS
+      kubernetes.core.k8s:
+        state: present
+        src: k8s/service.yml
+        namespace: abc-retail
+
+    - name: Wait for deployment to be ready
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        name: abc-retail-deployment
+        namespace: abc-retail
+      register: deployment_info
+      until: deployment_info.resources[0].status.readyReplicas == deployment_info.resources[0].status.replicas
+      retries: 30
+      delay: 10
+
+    - name: Get Load Balancer URL
+      kubernetes.core.k8s_info:
+        kind: Service
+        name: abc-retail-service
+        namespace: abc-retail
+      register: service_info
+
+    - name: Display EKS deployment information
+      debug:
+        msg: |
+          EKS Cluster setup completed successfully!
+          
+          Cluster Name: abc-retail-cluster
+          Region: us-east-1
+          Load Balancer URL: {{ service_info.resources[0].status.loadBalancer.ingress[0].hostname if service_info.resources[0].status.loadBalancer.ingress else 'Pending' }}
+          
+          Access your application at: http://{{ service_info.resources[0].status.loadBalancer.ingress[0].hostname if service_info.resources[0].status.loadBalancer.ingress else 'Pending' }} 

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: abc-retail-deployment
+  labels:
+    app: abc-retail
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: abc-retail
+  template:
+    metadata:
+      labels:
+        app: abc-retail
+    spec:
+      containers:
+      - name: abc-retail
+        image: vchaturvdocker/abc-retail-app:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      imagePullSecrets:
+      - name: dockerhub-secret
