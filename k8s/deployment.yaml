@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: abc-retail-deployment
+  name: abc-retail-app
   labels:
-    app: abc-retail
+    app: abc-retail-app
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
-      app: abc-retail
+      app: abc-retail-app
   template:
     metadata:
       labels:
-        app: abc-retail
+        app: abc-retail-app
     spec:
       containers:
-      - name: abc-retail
+      - name: abc-retail-app
         image: vchaturvdocker/abc-retail-app:latest
         ports:
         - containerPort: 8080

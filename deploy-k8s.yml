@@ -56,4 +56,34 @@
 
     - name: Display service information
       debug:
-        msg: "ABC Retail App deployed successfully! Service IP: {{ service_info.resources[0].status.loadBalancer.ingress[0].ip if service_info.resources[0].status.loadBalancer.ingress else 'Pending' }}" 
+        msg: "ABC Retail App deployed successfully! Service IP: {{ service_info.resources[0].status.loadBalancer.ingress[0].ip if service_info.resources[0].status.loadBalancer.ingress else 'Pending' }}"
+
+- name: Deploy updated Docker image to Kubernetes
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    kubeconfig_path: "/etc/rancher/k3s/k3s.yaml"
+    namespace: "abc-retail"
+    deployment_name: "abc-retail-app"
+    container_name: "abc-retail-app"
+    new_image: "vchaturvdocker/abc-retail-app:latest"
+  tasks:
+    - name: Update deployment image in Kubernetes
+      community.kubernetes.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        namespace: "{{ namespace }}"
+        kind: Deployment
+        name: "{{ deployment_name }}"
+        definition:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "{{ container_name }}"
+                    image: "{{ new_image }}"
+      register: k8s_result
+
+    - name: Print result
+      debug:
+        var: k8s_result 

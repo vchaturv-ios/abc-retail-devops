@@ -36,17 +36,13 @@ pipeline {
             }
         }
 
-        stage('Deploy to Application Server') {
+        stage('Deploy with Ansible') {
             steps {
-                script {
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_PATH')]) {
                     sh '''
-                        # Deploy to application server
-                        ssh -i /tmp/abc-retail-free-key.pem -o StrictHostKeyChecking=no ec2-user@107.21.169.207 "
-                            docker stop abc-retail-app || true
-                            docker rm abc-retail-app || true
-                            docker pull ${DOCKER_IMAGE}
-                            docker run -d --name abc-retail-app -p 8080:8080 ${DOCKER_IMAGE}
-                        "
+                        ansible-playbook deploy-k8s.yml \
+                          -e new_image=${DOCKER_IMAGE} \
+                          -e kubeconfig_path=$KUBECONFIG_PATH
                     '''
                 }
             }

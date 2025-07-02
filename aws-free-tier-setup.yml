@@ -118,7 +118,25 @@
           usermod -a -G docker ec2-user
           curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           chmod +x /usr/local/bin/docker-compose
-          docker run -d -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts
+          
+          # Stop any existing Jenkins container
+          docker stop jenkins-server 2>/dev/null || true
+          docker rm jenkins-server 2>/dev/null || true
+          
+          # Run Jenkins with Docker socket mounted and proper permissions
+          docker run -d \
+            --name jenkins-server \
+            -p 8080:8080 \
+            -p 50000:50000 \
+            -v jenkins_home:/var/jenkins_home \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v /usr/bin/docker:/usr/bin/docker \
+            --group-add docker \
+            jenkins/jenkins:lts
+          
+          # Wait for Jenkins to start and add jenkins user to docker group
+          sleep 30
+          docker exec jenkins-server usermod -a -G docker jenkins || true
         network:
           assign_public_ip: true
 

@@ -1,11 +1,29 @@
-# macOS
+# Ignore SSH keys and sensitive files
+*.pem
+*.key
+k3s-jenkins.yaml
+
+# Ignore build and IDE files
+*.class
+*.log
+*.swp
 .DS_Store
+.idea/
+.vscode/
+target/
+
+# Ignore OS and temp files
+Thumbs.db
+*.tmp
+
+# Ignore old/unneeded scripts
+*.bak
+*.old
 
 # Eclipse/IntelliJ
 .classpath
 .project
 .settings/
-.idea/
 *.iml
 
 # Maven target directory
