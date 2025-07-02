@@ -30,9 +30,8 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-creds') {
-                        sh "docker push ${DOCKER_IMAGE}"
-                    }
+                    sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
+                    sh "docker push ${DOCKER_IMAGE}"
                 }
             }
         }
