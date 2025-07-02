@@ -69,19 +69,12 @@
     container_name: "abc-retail-app"
     new_image: "vchaturvdocker/abc-retail-app:latest"
   tasks:
-    - name: Update deployment image in Kubernetes
+    - name: Update deployment in Kubernetes
       community.kubernetes.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
         namespace: "{{ namespace }}"
-        kind: Deployment
-        name: "{{ deployment_name }}"
-        definition:
-          spec:
-            template:
-              spec:
-                containers:
-                  - name: "{{ container_name }}"
-                    image: "{{ new_image }}"
+        src: k8s/deployment.yaml
+        state: present
       register: k8s_result
 
     - name: Print result
