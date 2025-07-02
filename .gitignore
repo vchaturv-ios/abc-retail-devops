@@ -2,6 +2,9 @@
 *.pem
 *.key
 k3s-jenkins.yaml
+kubeconfig
+*kubeconfig*
+*.kubeconfig
 
 # Ignore build and IDE files
 *.class
